@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep North — Thursday 7 May 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #map { height: 100vh; width: 100vw; }
+  .header {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 1000; font-size: 15px; font-weight: 600;
+  }
+  .leaflet-popup-content { font-size: 14px; line-height: 1.5; max-height: 350px; overflow-y: auto; }
+  .leaflet-popup-content h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
+  .leaflet-popup-content .gig { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+  .leaflet-popup-content .gig:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .leaflet-popup-content .gig-title { font-weight: bold; font-size: 14px; }
+  .leaflet-popup-content .gig-meta { color: #555; font-size: 12px; margin: 2px 0; }
+  .leaflet-popup-content .lineup { font-size: 12px; margin: 2px 0; }
+  .leaflet-popup-content .view-event { font-size: 11px; margin: 2px 0; }
+  .leaflet-popup-content a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
+  .leaflet-popup-content a:hover { text-decoration: none; background: #e8f0fe; }
+</style>
+</head>
+<body>
+<div class="header">Deep North — Thursday 7 May 2026</div>
+<div id="map"></div>
+<script>
+  const map = L.map('map').setView([-37.775, 144.985], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  }).addTo(map);
+
+  const venues = [{"name": "Shotkickers", "lat": -37.7559265, "lng": 145.0013923, "popupHtml": "<h3>Shotkickers</h3><div class=\"gig\"><div class=\"gig-title\">Big Black Maria</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3ccaKRLC69ITvQuwNiTgyd\" target=\"_blank\">Big Black Maria</a> | <a href=\"https://open.spotify.com/artist/32klh54Xut7Fyu3yc1J5YJ\" target=\"_blank\">Snailgun</a> | San | Black Wattle Witches</div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/9e684804-0a28-47fb-a7a7-9911dd1322e7\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "Cactus Room Thornbury", "lat": -37.7612582, "lng": 145.0004166, "popupHtml": "<h3>Cactus Room Thornbury</h3><div class=\"gig\"><div class=\"gig-title\">S.E.I.S.M.I.C - Playing Live In Melbourne/Naarm</div><div class=\"gig-meta\">19:00</div><div class=\"lineup\">S.E.I.S.M.I.C</div><div class=\"view-event\"><a href=\"https://www.undertheradar.co.nz/gig/101944/SEISMIC---Playing-Live-In-MelbourneNaarm.utr\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<h3>The Retreat Hotel</h3><div class=\"gig\"><div class=\"gig-title\">Salsodromo: Live band + Social Dancing</div><div class=\"gig-meta\">20:30</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/2egX2b6256XrO4WEaKXVcB\" target=\"_blank\">Salsodromo</a></div><div class=\"view-event\"><a href=\"https://www.eventbrite.com.au/e/1986378013109\" target=\"_blank\">View event &#8594;</a></div></div>"}];
+
+  venues.forEach(v => {
+    const marker = L.marker([v.lat, v.lng]).addTo(map);
+    marker.bindPopup(v.popupHtml);
+  });
+
+  
+  const playlistLink = document.createElement('a');
+  playlistLink.href = 'https://open.spotify.com/playlist/5YaGnpjjmw0zdDPuKk75kg';
+  playlistLink.target = '_blank';
+  playlistLink.textContent = 'Open Spotify Playlist';
+  playlistLink.style.cssText = 'position:absolute;top:10px;right:10px;background:rgba(30,215,96,0.95);color:#000;padding:8px 14px;border-radius:20px;font-weight:600;font-size:13px;text-decoration:none;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,0.15);';
+  document.body.appendChild(playlistLink);
+
+</script>
+</body>
+</html>
