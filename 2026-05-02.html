@@ -9,48 +9,92 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
   #map { height: 100vh; width: 100vw; }
+
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(9deg); }
+
   .header {
-    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 1000; font-size: 15px; font-weight: 600;
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    background: #D9D8CF; border: 1px solid #867A65; color: #867A65;
+    padding: 8px 20px; z-index: 1000; white-space: nowrap;
+    display: flex; align-items: center; gap: 16px;
   }
-  .leaflet-popup-content { font-size: 14px; line-height: 1.5; max-height: 350px; overflow-y: auto; }
-  .leaflet-popup-content h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
-  .leaflet-popup-content .gig { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-  .leaflet-popup-content .gig:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .leaflet-popup-content .gig-title { font-weight: bold; font-size: 14px; }
-  .leaflet-popup-content .gig-meta { color: #555; font-size: 12px; margin: 2px 0; }
-  .leaflet-popup-content .lineup { font-size: 12px; margin: 2px 0; }
-  .leaflet-popup-content .view-event { font-size: 11px; margin: 2px 0; }
-  .leaflet-popup-content a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
-  .leaflet-popup-content a:hover { text-decoration: none; background: #e8f0fe; }
+  .header-brand { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .header-sep { opacity: 0.4; }
+  .header-date { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
+
+  .playlist-btn {
+    position: absolute; top: 20px; right: 20px;
+    background: #D9D8CF; border: 1px solid #867A65; color: #867A65;
+    padding: 8px 16px; font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
+    text-decoration: none; z-index: 1000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  .leaflet-popup-content-wrapper {
+    background: #D9D8CF !important; border: 1px solid #867A65 !important;
+    border-radius: 0 !important; box-shadow: none !important; padding: 0 !important;
+  }
+  .leaflet-popup-tip { background: #D9D8CF !important; box-shadow: none !important; }
+  .leaflet-popup-tip-container { margin-top: -1px; }
+  .leaflet-popup-content { margin: 0 !important; color: #867A65; font-family: inherit; }
+  .leaflet-popup-close-button { color: #867A65 !important; font-size: 16px !important; top: 8px !important; right: 8px !important; }
+
+  .popup-inner { padding: 16px 20px 14px; min-width: 220px; max-width: 280px; }
+  .popup-venue { font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 14px; border-bottom: 1px solid rgba(134,122,101,0.3); padding-bottom: 10px; }
+  .popup-venue a { color: #867A65; text-decoration: none; }
+  .popup-venue a:hover { text-decoration: underline; }
+  .popup-gig { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(134,122,101,0.15); }
+  .popup-gig:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .popup-title { font-size: 13px; margin-bottom: 4px; }
+  .popup-meta { font-size: 11px; opacity: 0.65; margin-bottom: 4px; }
+  .popup-lineup { font-size: 11px; margin-bottom: 6px; line-height: 1.4; }
+  .popup-link { font-size: 10px; letter-spacing: 0.05em; }
+  .popup-link a { color: #867A65; text-decoration: underline; }
+
+  .dn-marker {
+    width: 10px; height: 10px; background: #867A65;
+    border: 2px solid #D9D8CF; border-radius: 50%; box-shadow: 0 0 0 1px #867A65;
+  }
 </style>
 </head>
 <body>
-<div class="header">Deep North — Saturday 2 May 2026</div>
+<div class="header">
+  <span class="header-brand">Deep North</span>
+  <span class="header-sep">—</span>
+  <span class="header-date">Saturday 2 May 2026</span>
+</div>
 <div id="map"></div>
 <script>
-  const map = L.map('map').setView([-37.775, 144.985], 13);
+  const map = L.map('map', { zoomControl: false }).setView([-37.775, 144.985], 13);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
   }).addTo(map);
 
-  const venues = [{"name": "Shotkickers", "lat": -37.7559265, "lng": 145.0013923, "popupHtml": "<h3>Shotkickers</h3><div class=\"gig\"><div class=\"gig-title\">Trunk Jam</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3GDJ5nqnTi2oz2zzDioZxl\" target=\"_blank\">SLAUX</a> | <a href=\"https://open.spotify.com/artist/4jAwNqt2DsEm2u3jmTGD4Z\" target=\"_blank\">Lalu</a> | <a href=\"https://open.spotify.com/artist/2iCx6qDm96w9a1rtdUsTe0\" target=\"_blank\">Knight Rider</a> | <a href=\"https://open.spotify.com/artist/3aSBt3ZuGJQZ52rm2Y7uOe\" target=\"_blank\">Hannah and The Heartstrings</a> | <a href=\"https://open.spotify.com/artist/48AB4g7D8UBDyN9mMWOR5K\" target=\"_blank\">Mondo Cane</a> | <a href=\"https://open.spotify.com/artist/4wfsuazv3y02pxt8MmHZD2\" target=\"_blank\">Huskees</a> | Issy and Akira</div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/d61ed73f-86c3-408a-a257-97a16bcae54b\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Night Cat", "lat": -37.7983052, "lng": 144.9794393, "popupHtml": "<h3>The Night Cat</h3><div class=\"gig\"><div class=\"gig-title\">24 HOURS OF MILO</div><div class=\"lineup\">24 HOURS OF MILO</div><div class=\"view-event\"><a href=\"https://www.universe.com/events/24-hours-of-milo-tickets-7NYSW6\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<h3>The Retreat Hotel</h3><div class=\"gig\"><div class=\"gig-title\">Cold Irons Bound</div><div class=\"gig-meta\">13:00 &middot; Free</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3AvtL3CQxZuUoEfO1PcZlX\" target=\"_blank\">Cold Irons Bound</a></div><div class=\"view-event\"><a href=\"https://retreathotelbrunswick.com.au/gigs/cold-irons-bound-beer-garden-retreat-hotel\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Good Music presents All Star</div><div class=\"gig-meta\">17:00 &middot; Free</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/7q7VVL0f9uICWdASxv1d9M\" target=\"_blank\">Good Music</a></div><div class=\"view-event\"><a href=\"https://retreathotelbrunswick.com.au/gigs/good-music-all-star-retreat-hotel-feb-21-45xme-ybg9n\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Workers Club", "lat": -37.8055776, "lng": 144.9769451, "popupHtml": "<h3>The Workers Club</h3><div class=\"gig\"><div class=\"gig-title\">MATINEE: Optic</div><div class=\"gig-meta\">13:00 &middot; $10.00</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/1vRz3sCz7iKtrmXK4HB1MI\" target=\"_blank\">Optic</a> | <a href=\"https://open.spotify.com/artist/0OkFVhBMPKQtmBj2YRy3Vu\" target=\"_blank\">Akira</a> | Whose House is This</div><div class=\"view-event\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/9614cc5c-7830-4424-951e-3ce4685597c5?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Optic</div><div class=\"gig-meta\">13:00 &middot; $10.00</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/1vRz3sCz7iKtrmXK4HB1MI\" target=\"_blank\">Optic</a> | <a href=\"https://open.spotify.com/artist/0OkFVhBMPKQtmBj2YRy3Vu\" target=\"_blank\">Akira</a> | Whose House is This</div><div class=\"view-event\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/9614cc5c-7830-4424-951e-3ce4685597c5?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Katana Cartel</div><div class=\"gig-meta\">20:00 &middot; $23.50</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/6MngbKovX3R5FrHMXbAqaL\" target=\"_blank\">Katana Cartel</a> | <a href=\"https://open.spotify.com/artist/00JLjw1G2ftHrwFsakowoQ\" target=\"_blank\">Demonhead</a> | <a href=\"https://open.spotify.com/artist/4qlNA35XJBmcmJO4PuwOtp\" target=\"_blank\">Kings Vengeance</a></div><div class=\"view-event\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/8d1fdf98-c8ea-448b-b4ad-5c45a5f5abf0?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "Cactus Room Thornbury", "lat": -37.7612582, "lng": 145.0004166, "popupHtml": "<h3>Cactus Room Thornbury</h3><div class=\"gig\"><div class=\"gig-title\">Snailgun - Glass Walls ALBUM LAUNCH</div><div class=\"gig-meta\">19:00 &middot; $15.00</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/32klh54Xut7Fyu3yc1J5YJ\" target=\"_blank\">Snailgun</a> | <a href=\"https://open.spotify.com/artist/2rd0c98cNhoPLP3p2hZkpJ\" target=\"_blank\">No Hoper</a> | <a href=\"https://open.spotify.com/artist/04ekquPFZIvL2WghugNKG3\" target=\"_blank\">Waxman</a> | <a href=\"https://open.spotify.com/artist/1Fs8DT2yzm0dxpUD7sKJtV\" target=\"_blank\">Winternationale</a></div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/253c7772-6a13-4da5-bedd-ac2824e84493\" target=\"_blank\">View event &#8594;</a></div></div>"}];
+  const dnIcon = L.divIcon({
+    className: '',
+    html: '<div class="dn-marker"></div>',
+    iconSize: [10, 10],
+    iconAnchor: [5, 5],
+    popupAnchor: [0, -10]
+  });
+
+  const venues = [{"name": "Shotkickers", "lat": -37.7559265, "lng": 145.0013923, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Shotkickers</div><div class=\"popup-gig\"><div class=\"popup-title\">Trunk Jam</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/3GDJ5nqnTi2oz2zzDioZxl\" target=\"_blank\">SLAUX</a> | <a href=\"https://open.spotify.com/artist/4jAwNqt2DsEm2u3jmTGD4Z\" target=\"_blank\">Lalu</a> | <a href=\"https://open.spotify.com/artist/2iCx6qDm96w9a1rtdUsTe0\" target=\"_blank\">Knight Rider</a> | <a href=\"https://open.spotify.com/artist/3aSBt3ZuGJQZ52rm2Y7uOe\" target=\"_blank\">Hannah and The Heartstrings</a> | <a href=\"https://open.spotify.com/artist/48AB4g7D8UBDyN9mMWOR5K\" target=\"_blank\">Mondo Cane</a> | <a href=\"https://open.spotify.com/artist/4wfsuazv3y02pxt8MmHZD2\" target=\"_blank\">Huskees</a> | Issy and Akira</div><div class=\"popup-link\"><a href=\"https://tickets.oztix.com.au/outlet/event/d61ed73f-86c3-408a-a257-97a16bcae54b\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "The Night Cat", "lat": -37.7983052, "lng": 144.9794393, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Night Cat</div><div class=\"popup-gig\"><div class=\"popup-title\">24 HOURS OF MILO</div><div class=\"popup-lineup\">24 HOURS OF MILO</div><div class=\"popup-link\"><a href=\"https://www.universe.com/events/24-hours-of-milo-tickets-7NYSW6\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Retreat Hotel</div><div class=\"popup-gig\"><div class=\"popup-title\">Cold Irons Bound</div><div class=\"popup-meta\">13:00 &middot; Free</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/3AvtL3CQxZuUoEfO1PcZlX\" target=\"_blank\">Cold Irons Bound</a></div><div class=\"popup-link\"><a href=\"https://retreathotelbrunswick.com.au/gigs/cold-irons-bound-beer-garden-retreat-hotel\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Good Music presents All Star</div><div class=\"popup-meta\">17:00 &middot; Free</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/7q7VVL0f9uICWdASxv1d9M\" target=\"_blank\">Good Music</a></div><div class=\"popup-link\"><a href=\"https://retreathotelbrunswick.com.au/gigs/good-music-all-star-retreat-hotel-feb-21-45xme-ybg9n\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "The Workers Club", "lat": -37.8055776, "lng": 144.9769451, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Workers Club</div><div class=\"popup-gig\"><div class=\"popup-title\">MATINEE: Optic</div><div class=\"popup-meta\">13:00 &middot; $10.00</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/1vRz3sCz7iKtrmXK4HB1MI\" target=\"_blank\">Optic</a> | <a href=\"https://open.spotify.com/artist/0OkFVhBMPKQtmBj2YRy3Vu\" target=\"_blank\">Akira</a> | Whose House is This</div><div class=\"popup-link\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/9614cc5c-7830-4424-951e-3ce4685597c5?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Optic</div><div class=\"popup-meta\">13:00 &middot; $10.00</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/1vRz3sCz7iKtrmXK4HB1MI\" target=\"_blank\">Optic</a> | <a href=\"https://open.spotify.com/artist/0OkFVhBMPKQtmBj2YRy3Vu\" target=\"_blank\">Akira</a> | Whose House is This</div><div class=\"popup-link\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/9614cc5c-7830-4424-951e-3ce4685597c5?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Katana Cartel</div><div class=\"popup-meta\">20:00 &middot; $23.50</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/6MngbKovX3R5FrHMXbAqaL\" target=\"_blank\">Katana Cartel</a> | <a href=\"https://open.spotify.com/artist/00JLjw1G2ftHrwFsakowoQ\" target=\"_blank\">Demonhead</a> | <a href=\"https://open.spotify.com/artist/4qlNA35XJBmcmJO4PuwOtp\" target=\"_blank\">Kings Vengeance</a></div><div class=\"popup-link\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/8d1fdf98-c8ea-448b-b4ad-5c45a5f5abf0?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "Nighthawks", "lat": -37.7985, "lng": 144.979, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Nighthawks</div><div class=\"popup-gig\"><div class=\"popup-title\">Seedy Jeezus \u2014 Prog Set w/ The Miffs &amp; Foot (Nighthawks Residency)</div><div class=\"popup-meta\">15:00</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/79JQ1pUrBJFUIMJTEs1dVC\" target=\"_blank\">Seedy Jeezus</a> | <a href=\"https://open.spotify.com/artist/5sWwjadzJRlCu4eymNIvh5\" target=\"_blank\">The Miffs</a> | Foot</div><div class=\"popup-link\"><a href=\"https://events.humanitix.com/seedy-jeezus-nighthawks-residency-may-2026\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Okay Dane w/ Materia, and Dempsey</div><div class=\"popup-meta\">20:00</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/7fB8Sfdvd6FNGLTZJ7XhaC\" target=\"_blank\">Okay Dane</a> | <a href=\"https://open.spotify.com/artist/7yegFhKemMedsme3entsAW\" target=\"_blank\">Materia</a> | <a href=\"https://open.spotify.com/artist/11PYyk3kBXjDIFHiCc0psS\" target=\"_blank\">Dempsey</a></div><div class=\"popup-link\"><a href=\"https://events.humanitix.com/the-return-of-okay-dane?_gl=1%2Avsabjg%2A_gcl_au%2AMTAxMDczNDI4NS4xNzc0ODU5NzM1%2A_ga%2AMjEyODQ0OTE3NC4xNzc0ODU5NzM2%2A_ga_LHKW5FR9N6%2AczE3NzQ4NjYzNTUkbzIkZzEkdDE3NzQ4NjY4MzYkajMwJGwwJGgw\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "The Tote", "lat": -37.7995023, "lng": 144.9871252, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Tote</div><div class=\"popup-gig\"><div class=\"popup-title\">ENZYME &quot;OLDER AND NOISIER&quot; 10 YEAR ANNIVERSARY</div><div class=\"popup-meta\">18:30 &middot; $55.60</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/0rKS9aTsSWXKCwChquop2F\" target=\"_blank\">Enzyme</a> | <a href=\"https://open.spotify.com/artist/6j1La1fkBWt6vQcwwXla0w\" target=\"_blank\">Sukatani</a> | <a href=\"https://open.spotify.com/artist/0ozfyvvBLbIbuhELtY1sGX\" target=\"_blank\">Slant</a> | <a href=\"https://open.spotify.com/artist/56SYMbKRpFrgpaw2KonMAF\" target=\"_blank\">Gaoled</a> | <a href=\"https://open.spotify.com/artist/3bmcpEednVDzFUBkO0rtSo\" target=\"_blank\">Cr\u00eaam S\u00f6da</a> | Vasta Ruina | <a href=\"https://open.spotify.com/artist/5BvJzeQpmsdsFp4HGUYUEx\" target=\"_blank\">Vampire</a> | <a href=\"https://open.spotify.com/artist/3H9aUontw9uSlcCDrKwJoE\" target=\"_blank\">Shove</a> | <a href=\"https://open.spotify.com/artist/6rUSLxDrXFEXiAHhWTH5JO\" target=\"_blank\">Involucro</a></div><div class=\"popup-link\"><a href=\"https://thetotehotel.oztix.com.au/outlet/event/e7005892-29a2-420f-b4f5-9a800f2957c3?utm_source=TheToteHotel&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "Cactus Room Thornbury", "lat": -37.7612582, "lng": 145.0004166, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Cactus Room Thornbury</div><div class=\"popup-gig\"><div class=\"popup-title\">Snailgun - Glass Walls ALBUM LAUNCH</div><div class=\"popup-meta\">19:00 &middot; $15.00</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/32klh54Xut7Fyu3yc1J5YJ\" target=\"_blank\">Snailgun</a> | <a href=\"https://open.spotify.com/artist/2rd0c98cNhoPLP3p2hZkpJ\" target=\"_blank\">No Hoper</a> | <a href=\"https://open.spotify.com/artist/04ekquPFZIvL2WghugNKG3\" target=\"_blank\">Waxman</a> | <a href=\"https://open.spotify.com/artist/1Fs8DT2yzm0dxpUD7sKJtV\" target=\"_blank\">Winternationale</a></div><div class=\"popup-link\"><a href=\"https://tickets.oztix.com.au/outlet/event/253c7772-6a13-4da5-bedd-ac2824e84493\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "Punters Club", "lat": -37.7960561, "lng": 144.9790327, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Punters Club</div><div class=\"popup-gig\"><div class=\"popup-title\">SWEETIE &amp; FRIENDS | ROOFTOP VINYL PARTY</div><div class=\"popup-meta\">19:00</div><div class=\"popup-lineup\">Sweetie &amp; Friends</div><div class=\"popup-link\"><a href=\"https://www.facebook.com/events/4445005662407461/\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">REAL SUNNIES | LIVE</div><div class=\"popup-meta\">22:00 &middot; Free</div><div class=\"popup-lineup\">Real Sunnies</div><div class=\"popup-link\"><a href=\"https://www.facebook.com/events/1655565028806015/\" target=\"_blank\">View event &#8594;</a></div></div></div>"}];
 
   venues.forEach(v => {
-    const marker = L.marker([v.lat, v.lng]).addTo(map);
-    marker.bindPopup(v.popupHtml);
+    L.marker([v.lat, v.lng], { icon: dnIcon }).addTo(map).bindPopup(v.popupHtml);
   });
 
   
   const playlistLink = document.createElement('a');
   playlistLink.href = 'https://open.spotify.com/playlist/00hULCU7rRWrl0vyg7KBwI';
   playlistLink.target = '_blank';
-  playlistLink.textContent = 'Open Spotify Playlist';
-  playlistLink.style.cssText = 'position:absolute;top:10px;right:10px;background:rgba(30,215,96,0.95);color:#000;padding:8px 14px;border-radius:20px;font-weight:600;font-size:13px;text-decoration:none;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,0.15);';
+  playlistLink.textContent = 'Open Playlist ↗';
+  playlistLink.className = 'playlist-btn';
   document.body.appendChild(playlistLink);
 
 </script>
