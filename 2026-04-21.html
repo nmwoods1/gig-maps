@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep North — Tuesday 21 Apr 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #map { height: 100vh; width: 100vw; }
+  .header {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 1000; font-size: 15px; font-weight: 600;
+  }
+  .leaflet-popup-content { font-size: 14px; line-height: 1.5; max-height: 350px; overflow-y: auto; }
+  .leaflet-popup-content h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
+  .leaflet-popup-content .gig { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+  .leaflet-popup-content .gig:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .leaflet-popup-content .time { color: #666; font-size: 12px; }
+  .leaflet-popup-content a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
+  .leaflet-popup-content a:hover { text-decoration: none; background: #e8f0fe; }
+  .leaflet-popup-content .ticket-link { font-size: 12px; margin-left: 4px; font-weight: 400; }
+  .leaflet-popup-content .artist-link::after { content: ' 97'; font-size: 11px; opacity: 0.6; }
+</style>
+</head>
+<body>
+<div class="header">Deep North — Tuesday 21 Apr 2026</div>
+<div id="map"></div>
+<script>
+  const map = L.map('map').setView([-37.775, 144.985], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  }).addTo(map);
+
+  const venues = [{"name": "The Workers Club", "lat": -37.8055776, "lng": 144.9769451, "popupHtml": "<h3>The Workers Club</h3><div class=\"gig\">RESIDENCY: Mutton Tuesdays ft. Mary & the Little Lambs <span class=\"time\">@ 19:00</span> <a class=\"ticket-link\" href=\"https://theworkersclub.oztix.com.au/outlet/event/c76b4d54-2a4a-4e72-9776-08af0dfb45ec\" target=\"_blank\">View event</a></div><div class=\"gig\">Front Bar: Workers Pub Quiz <span class=\"time\">@ 19:30</span> <a class=\"ticket-link\" href=\"https://theworkersclub.oztix.com.au/outlet/event/fe65ebb3-df62-4e9b-b63c-a2f4074e2a0c\" target=\"_blank\">View event</a></div>"}, {"name": "Bar Open", "lat": -37.7976389, "lng": 144.9783774, "popupHtml": "<h3>Bar Open</h3><div class=\"gig\">Make It Up Club <span class=\"time\">@ 19:30</span> <a class=\"ticket-link\" href=\"https://baropen.oztix.com.au/outlet/event/a5cc2f83-8f01-43b1-903a-86220605d283\" target=\"_blank\">View event</a></div>"}, {"name": "Shotkickers", "lat": -37.7559265, "lng": 145.0013923, "popupHtml": "<h3>Shotkickers</h3><div class=\"gig\">Don't Sweat the Technique copy copy copy <span class=\"time\">@ 20:00</span> <a class=\"ticket-link\" href=\"https://www.shotkickers.com/gigs\" target=\"_blank\">View event</a></div>"}];
+
+  venues.forEach(v => {
+    const marker = L.marker([v.lat, v.lng]).addTo(map);
+    marker.bindPopup(v.popupHtml);
+  });
+
+  
+</script>
+</body>
+</html>

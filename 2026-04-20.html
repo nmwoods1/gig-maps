@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep North — Monday 20 Apr 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #map { height: 100vh; width: 100vw; }
+  .header {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 1000; font-size: 15px; font-weight: 600;
+  }
+  .leaflet-popup-content { font-size: 14px; line-height: 1.5; max-height: 350px; overflow-y: auto; }
+  .leaflet-popup-content h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
+  .leaflet-popup-content .gig { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+  .leaflet-popup-content .gig:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .leaflet-popup-content .time { color: #666; font-size: 12px; }
+  .leaflet-popup-content a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
+  .leaflet-popup-content a:hover { text-decoration: none; background: #e8f0fe; }
+  .leaflet-popup-content .ticket-link { font-size: 12px; margin-left: 4px; font-weight: 400; }
+  .leaflet-popup-content .artist-link::after { content: ' 97'; font-size: 11px; opacity: 0.6; }
+</style>
+</head>
+<body>
+<div class="header">Deep North — Monday 20 Apr 2026</div>
+<div id="map"></div>
+<script>
+  const map = L.map('map').setView([-37.775, 144.985], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  }).addTo(map);
+
+  const venues = [{"name": "Punters Club", "lat": -37.7960561, "lng": 144.9790327, "popupHtml": "<h3>Punters Club</h3><div class=\"gig\">\u2663\ufe0e OUR WEEKENDS END ON MONDAYS! \u2663\ufe0e Kitty Mustang <span class=\"time\">@ 20:00</span> <a class=\"ticket-link\" href=\"https://www.puntersclubfitzroy.com/whats-on\" target=\"_blank\">View event</a></div><div class=\"gig\">\u2663\ufe0e OUR WEEKENDS END ON MONDAYS! \u2663\ufe0e Will Baker <span class=\"time\">@ 20:00</span> <a class=\"ticket-link\" href=\"https://www.puntersclubfitzroy.com/whats-on\" target=\"_blank\">View event</a></div>"}];
+
+  venues.forEach(v => {
+    const marker = L.marker([v.lat, v.lng]).addTo(map);
+    marker.bindPopup(v.popupHtml);
+  });
+
+  
+</script>
+</body>
+</html>

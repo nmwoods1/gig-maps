@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep North — Saturday 25 Apr 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #map { height: 100vh; width: 100vw; }
+  .header {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 1000; font-size: 15px; font-weight: 600;
+  }
+  .leaflet-popup-content { font-size: 14px; line-height: 1.5; max-height: 350px; overflow-y: auto; }
+  .leaflet-popup-content h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
+  .leaflet-popup-content .gig { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+  .leaflet-popup-content .gig:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .leaflet-popup-content .gig-title { font-weight: bold; font-size: 14px; }
+  .leaflet-popup-content .gig-meta { color: #555; font-size: 12px; margin: 2px 0; }
+  .leaflet-popup-content .lineup { font-size: 12px; margin: 2px 0; }
+  .leaflet-popup-content .view-event { font-size: 11px; margin: 2px 0; }
+  .leaflet-popup-content a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
+  .leaflet-popup-content a:hover { text-decoration: none; background: #e8f0fe; }
+</style>
+</head>
+<body>
+<div class="header">Deep North — Saturday 25 Apr 2026</div>
+<div id="map"></div>
+<script>
+  const map = L.map('map').setView([-37.775, 144.985], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  }).addTo(map);
+
+  const venues = [{"name": "Shotkickers", "lat": -37.7559265, "lng": 145.0013923, "popupHtml": "<h3>Shotkickers</h3><div class=\"gig\"><div class=\"gig-title\">Overthinker - &#x27;You&#x27;re Surrounded By People Who Love You&#x27; EP Launch</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/5iQ2tyRloyNp6Yjd5sv73C\" target=\"_blank\">Overthinker</a> | <a href=\"https://open.spotify.com/artist/7mdvhaSWHeAPpl0nBxivVa\" target=\"_blank\">Grass Stains</a> | <a href=\"https://open.spotify.com/artist/0MuyWbMIawyHtCsJkQB3B2\" target=\"_blank\">The Flying So High-Os</a> | <a href=\"https://open.spotify.com/artist/6IjdAmRfvXiN2IdUQqvNaZ\" target=\"_blank\">Kelsie Paige Rimmer</a></div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/252cf1fb-68b6-4df1-80f9-099f01460e2d\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Wind Wand (arvo)</div><div class=\"gig-meta\">$10.00</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/14NNJXZz0pZ3LOYHma82cZ\" target=\"_blank\">Wind Wand</a> | Kotlas Begemot | Muc Mhara | <a href=\"https://open.spotify.com/artist/5yBpjijkfZ6KXNU0OcKI1R\" target=\"_blank\">scarlet.rain</a></div><div class=\"view-event\"><a href=\"https://www.shotkickers.com/gigs/wind-wand-arvo\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Night Cat", "lat": -37.7983052, "lng": 144.9794393, "popupHtml": "<h3>The Night Cat</h3><div class=\"gig\"><div class=\"gig-title\">Prizefight</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3imo6DPDraLtBLvbMcuL0q\" target=\"_blank\">Prizefight</a></div><div class=\"view-event\"><a href=\"https://thenightcat.com.au/events/69ba7275cc336c003c63386b\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<h3>The Retreat Hotel</h3><div class=\"gig\"><div class=\"gig-title\">Temporary Blessings + Brenda + DJ Emma Peel</div><div class=\"gig-meta\">15:00 &middot; Free</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3Bc1Mef9W58CrRMP2sLYMC\" target=\"_blank\">Temporary Blessings</a> | <a href=\"https://open.spotify.com/artist/4cPHsZM98sKzmV26wlwD2W\" target=\"_blank\">Brenda</a> | DJ Emma Peel</div><div class=\"view-event\"><a href=\"https://retreathotelbrunswick.com.au/gigs/college-of-knowledge-records\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Hanky Panky Social Club - Mums Drunk EP Launch</div><div class=\"gig-meta\">20:00</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3aWe27NaujQKdzLmMsvo2Z\" target=\"_blank\">Hanky Panky Social Club</a> | <a href=\"https://open.spotify.com/artist/4jrjlD5mc0IBz55Tasslg1\" target=\"_blank\">Doc Halibut</a> | The Lovely Boys</div><div class=\"view-event\"><a href=\"https://www.eventbrite.com.au/e/1985356916983\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Workers Club", "lat": -37.8055776, "lng": 144.9769451, "popupHtml": "<h3>The Workers Club</h3><div class=\"gig\"><div class=\"gig-title\">HARDGORE 2026</div><div class=\"gig-meta\">18:30 &middot; $17.85</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3UANLhOnaaoOHs1pfzM7wy\" target=\"_blank\">SCATTERED LIMBS</a> | <a href=\"https://open.spotify.com/artist/4V63nI2GAKSYUqRJE2jNGw\" target=\"_blank\">Demise</a> | <a href=\"https://open.spotify.com/artist/6IxGAeSFJe7AH93dkbQGDE\" target=\"_blank\">Nembutolik</a> | <a href=\"https://open.spotify.com/artist/0C45r20smIFshjMFSxdSii\" target=\"_blank\">Skurge</a> | Kniver | <a href=\"https://open.spotify.com/artist/3TAy1Gazebv32f4p060Apm\" target=\"_blank\">Nebulam</a></div><div class=\"view-event\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/57ea7d2c-72c5-4e87-a8b7-793c851de44c?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "Cactus Room Thornbury", "lat": -37.7612582, "lng": 145.0004166, "popupHtml": "<h3>Cactus Room Thornbury</h3><div class=\"gig\"><div class=\"gig-title\">Fenn Wilson and The Weather</div><div class=\"gig-meta\">20:00 &middot; $20.00</div><div class=\"lineup\">Fenn Wilson and The Weather | <a href=\"https://open.spotify.com/artist/7IAvo6jpUmUVxf8f6Lft1y\" target=\"_blank\">Convenience Store</a> | <a href=\"https://open.spotify.com/artist/2rfHGs9ompgU7PVzJV33B4\" target=\"_blank\">Prink</a></div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/45ca8716-30a5-401d-a789-54a42515defd\" target=\"_blank\">View event &#8594;</a></div></div>"}];
+
+  venues.forEach(v => {
+    const marker = L.marker([v.lat, v.lng]).addTo(map);
+    marker.bindPopup(v.popupHtml);
+  });
+
+  
+  const playlistLink = document.createElement('a');
+  playlistLink.href = 'https://open.spotify.com/playlist/2e3bAf2WTniqxXK1V1SZOF';
+  playlistLink.target = '_blank';
+  playlistLink.textContent = 'Open Spotify Playlist';
+  playlistLink.style.cssText = 'position:absolute;top:10px;right:10px;background:rgba(30,215,96,0.95);color:#000;padding:8px 14px;border-radius:20px;font-weight:600;font-size:13px;text-decoration:none;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,0.15);';
+  document.body.appendChild(playlistLink);
+
+</script>
+</body>
+</html>
