@@ -9,48 +9,92 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
   #map { height: 100vh; width: 100vw; }
+
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(9deg); }
+
   .header {
-    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 1000; font-size: 15px; font-weight: 600;
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    background: #D9D8CF; border: 1px solid #867A65; color: #867A65;
+    padding: 8px 20px; z-index: 1000; white-space: nowrap;
+    display: flex; align-items: center; gap: 16px;
   }
-  .leaflet-popup-content { font-size: 14px; line-height: 1.5; max-height: 350px; overflow-y: auto; }
-  .leaflet-popup-content h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
-  .leaflet-popup-content .gig { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-  .leaflet-popup-content .gig:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .leaflet-popup-content .gig-title { font-weight: bold; font-size: 14px; }
-  .leaflet-popup-content .gig-meta { color: #555; font-size: 12px; margin: 2px 0; }
-  .leaflet-popup-content .lineup { font-size: 12px; margin: 2px 0; }
-  .leaflet-popup-content .view-event { font-size: 11px; margin: 2px 0; }
-  .leaflet-popup-content a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
-  .leaflet-popup-content a:hover { text-decoration: none; background: #e8f0fe; }
+  .header-brand { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .header-sep { opacity: 0.4; }
+  .header-date { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
+
+  .playlist-btn {
+    position: absolute; top: 20px; right: 20px;
+    background: #D9D8CF; border: 1px solid #867A65; color: #867A65;
+    padding: 8px 16px; font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
+    text-decoration: none; z-index: 1000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  .leaflet-popup-content-wrapper {
+    background: #D9D8CF !important; border: 1px solid #867A65 !important;
+    border-radius: 0 !important; box-shadow: none !important; padding: 0 !important;
+  }
+  .leaflet-popup-tip { background: #D9D8CF !important; box-shadow: none !important; }
+  .leaflet-popup-tip-container { margin-top: -1px; }
+  .leaflet-popup-content { margin: 0 !important; color: #867A65; font-family: inherit; }
+  .leaflet-popup-close-button { color: #867A65 !important; font-size: 16px !important; top: 8px !important; right: 8px !important; }
+
+  .popup-inner { padding: 16px 20px 14px; min-width: 220px; max-width: 280px; }
+  .popup-venue { font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 14px; border-bottom: 1px solid rgba(134,122,101,0.3); padding-bottom: 10px; }
+  .popup-venue a { color: #867A65; text-decoration: none; }
+  .popup-venue a:hover { text-decoration: underline; }
+  .popup-gig { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(134,122,101,0.15); }
+  .popup-gig:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .popup-title { font-size: 13px; margin-bottom: 4px; }
+  .popup-meta { font-size: 11px; opacity: 0.65; margin-bottom: 4px; }
+  .popup-lineup { font-size: 11px; margin-bottom: 6px; line-height: 1.4; }
+  .popup-link { font-size: 10px; letter-spacing: 0.05em; }
+  .popup-link a { color: #867A65; text-decoration: underline; }
+
+  .dn-marker {
+    width: 10px; height: 10px; background: #867A65;
+    border: 2px solid #D9D8CF; border-radius: 50%; box-shadow: 0 0 0 1px #867A65;
+  }
 </style>
 </head>
 <body>
-<div class="header">Deep North — Saturday 9 May 2026</div>
+<div class="header">
+  <span class="header-brand">Deep North</span>
+  <span class="header-sep">—</span>
+  <span class="header-date">Saturday 9 May 2026</span>
+</div>
 <div id="map"></div>
 <script>
-  const map = L.map('map').setView([-37.775, 144.985], 13);
+  const map = L.map('map', { zoomControl: false }).setView([-37.775, 144.985], 13);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
   }).addTo(map);
 
-  const venues = [{"name": "Shotkickers", "lat": -37.7559265, "lng": 145.0013923, "popupHtml": "<h3>Shotkickers</h3><div class=\"gig\"><div class=\"gig-title\">Dead City Ruins</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/5rVIdkffmBTBApZkkmMbHn\" target=\"_blank\">Dead City Ruins</a></div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/b6f47a05-be8c-4d6b-b416-55e5dabe0f1a\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Evan Silence</div><div class=\"gig-meta\">14:00</div><div class=\"lineup\">Evvy George | <a href=\"https://open.spotify.com/artist/060Rk9TRyOKydbSOG1skT4\" target=\"_blank\">Freya Josephine Hollick</a></div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/66f7b1ab-c0ec-4548-a9dd-cf65c32c3d4d\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Night Cat", "lat": -37.7983052, "lng": 144.9794393, "popupHtml": "<h3>The Night Cat</h3><div class=\"gig\"><div class=\"gig-title\">JOEY LIGHTBULB &amp; FRIENDS: BY REQUEST</div><div class=\"lineup\">Joey Lightbulb</div><div class=\"view-event\"><a href=\"https://www.universe.com/events/joey-lightbulb-friends-by-request-tickets-48N169\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<h3>The Retreat Hotel</h3><div class=\"gig\"><div class=\"gig-title\">Anatreptix</div><div class=\"gig-meta\">14:00 &middot; Free</div><div class=\"lineup\">Anatreptix</div><div class=\"view-event\"><a href=\"https://retreathotelbrunswick.com.au/gigs/2024/3/16/anatreptix-4p5jy-pjwxy-xr33a-a8gzd-4jye8-cplgc-jrhd3-6g4g4-6kpdy-fdl92-atdpn-sjayh-p4cf3-xzn59-mh5fn-szrre\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Mona Lisa and the Lourve Bandits</div><div class=\"gig-meta\">20:00 &middot; Free</div><div class=\"lineup\">Mona Lisa and the Lourve Bandits</div><div class=\"view-event\"><a href=\"https://retreathotelbrunswick.com.au/gigs/mona-lisa-and-the-lourve-bandits\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "Cactus Room Thornbury", "lat": -37.7612582, "lng": 145.0004166, "popupHtml": "<h3>Cactus Room Thornbury</h3><div class=\"gig\"><div class=\"gig-title\">Mirror Clippers</div><div class=\"gig-meta\">20:00 &middot; $15.00</div><div class=\"lineup\">Mirror Clippers | <a href=\"https://open.spotify.com/artist/2RMwEUBsOq8uBPpNev8DdZ\" target=\"_blank\">Dopplerhaus</a> | <a href=\"https://open.spotify.com/artist/5s0u3caXjjbYFc6ZmofeMQ\" target=\"_blank\">Sanszu</a> | Heavy Delay</div><div class=\"view-event\"><a href=\"https://tickets.oztix.com.au/outlet/event/e66ae764-486f-4efa-87d7-36d26b79729c\" target=\"_blank\">View event &#8594;</a></div></div>"}, {"name": "The Workers Club", "lat": -37.8055776, "lng": 144.9769451, "popupHtml": "<h3>The Workers Club</h3><div class=\"gig\"><div class=\"gig-title\">Sleep Box Hotel</div><div class=\"gig-meta\">20:00 &middot; $14.80</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3UMkoy35Tx5iv1VVgFny8Y\" target=\"_blank\">Sleep Box Hotel</a> | <a href=\"https://open.spotify.com/artist/73egpdU9HnxSs6GpycKeWU\" target=\"_blank\">Malibu Spacey</a> | Slow Exposure</div><div class=\"view-event\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/f10dba4c-2ebd-4288-a1e5-4b6d97989ed7?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"gig\"><div class=\"gig-title\">Sleep Box Hotel - &quot;Melanie Lane&quot; Launch</div><div class=\"gig-meta\">20:00 &middot; $14.80</div><div class=\"lineup\"><a href=\"https://open.spotify.com/artist/3UMkoy35Tx5iv1VVgFny8Y\" target=\"_blank\">Sleep Box Hotel</a> | <a href=\"https://open.spotify.com/artist/73egpdU9HnxSs6GpycKeWU\" target=\"_blank\">Malibu Spacey</a> | Slow Exposure</div><div class=\"view-event\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/f10dba4c-2ebd-4288-a1e5-4b6d97989ed7?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div>"}];
+  const dnIcon = L.divIcon({
+    className: '',
+    html: '<div class="dn-marker"></div>',
+    iconSize: [10, 10],
+    iconAnchor: [5, 5],
+    popupAnchor: [0, -10]
+  });
+
+  const venues = [{"name": "Shotkickers", "lat": -37.7559265, "lng": 145.0013923, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Shotkickers</div><div class=\"popup-gig\"><div class=\"popup-title\">Dead City Ruins</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/5rVIdkffmBTBApZkkmMbHn\" target=\"_blank\">Dead City Ruins</a></div><div class=\"popup-link\"><a href=\"https://tickets.oztix.com.au/outlet/event/b6f47a05-be8c-4d6b-b416-55e5dabe0f1a\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Evan Silence</div><div class=\"popup-meta\">14:00</div><div class=\"popup-lineup\">Evvy George | <a href=\"https://open.spotify.com/artist/060Rk9TRyOKydbSOG1skT4\" target=\"_blank\">Freya Josephine Hollick</a></div><div class=\"popup-link\"><a href=\"https://tickets.oztix.com.au/outlet/event/66f7b1ab-c0ec-4548-a9dd-cf65c32c3d4d\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "The Night Cat", "lat": -37.7983052, "lng": 144.9794393, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Night Cat</div><div class=\"popup-gig\"><div class=\"popup-title\">JOEY LIGHTBULB &amp; FRIENDS: BY REQUEST</div><div class=\"popup-lineup\">Joey Lightbulb</div><div class=\"popup-link\"><a href=\"https://www.universe.com/events/joey-lightbulb-friends-by-request-tickets-48N169\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Retreat Hotel</div><div class=\"popup-gig\"><div class=\"popup-title\">Anatreptix</div><div class=\"popup-meta\">14:00 &middot; Free</div><div class=\"popup-lineup\">Anatreptix</div><div class=\"popup-link\"><a href=\"https://retreathotelbrunswick.com.au/gigs/2024/3/16/anatreptix-4p5jy-pjwxy-xr33a-a8gzd-4jye8-cplgc-jrhd3-6g4g4-6kpdy-fdl92-atdpn-sjayh-p4cf3-xzn59-mh5fn-szrre\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Mona Lisa and the Lourve Bandits</div><div class=\"popup-meta\">20:00 &middot; Free</div><div class=\"popup-lineup\">Mona Lisa and the Lourve Bandits</div><div class=\"popup-link\"><a href=\"https://retreathotelbrunswick.com.au/gigs/mona-lisa-and-the-lourve-bandits\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "Nighthawks", "lat": -37.7985, "lng": 144.979, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Nighthawks</div><div class=\"popup-gig\"><div class=\"popup-title\">Seedy Jeezus - Freak Out Set w/ El Bebe &amp; Scarnon (Nighthawks Residency)</div><div class=\"popup-meta\">15:00</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/79JQ1pUrBJFUIMJTEs1dVC\" target=\"_blank\">Seedy Jeezus</a> | <a href=\"https://open.spotify.com/artist/1vyEBbMwwG3JrebrUuOhyS\" target=\"_blank\">El Bebe</a> | <a href=\"https://open.spotify.com/artist/0GWA38fD4CMkCTyRvB1gcq\" target=\"_blank\">Scarnon</a></div><div class=\"popup-link\"><a href=\"https://events.humanitix.com/seedy-jeezus-nighthawks-residency-may-2026?fbclid=IwVERDUAQ51plleHRuA2FlbQIxMABzcnRjBmFwcF9pZAo2NjI4NTY4Mzc5AAEe2XT6jgHF1G9TuGxtIAwUuemJOZzV1FHWV716dAiSyhjgmT5t8FBLflp2tRo_aem_IeGdUNjdD2KvkmkZ-0e_2g\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Deadheat May-Hem Tour</div><div class=\"popup-meta\">20:00</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/7cS9uhaI7wrLfRQV9U0aja\" target=\"_blank\">Deadheat</a> | <a href=\"https://open.spotify.com/artist/6gFyIZAPcq8aIyEjINNVRT\" target=\"_blank\">Judo CHOP!</a> | <a href=\"https://open.spotify.com/artist/6O3fLzyuZRmVEX6Nf8sTg5\" target=\"_blank\">Ultravlt</a> | <a href=\"https://open.spotify.com/artist/6TPBTbxnivDO9k1Y9np1Iq\" target=\"_blank\">Loose End</a></div><div class=\"popup-link\"><a href=\"https://events.humanitix.com/deadheat-may-hem-tour-9th-may-2026\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "Punters Club", "lat": -37.7960561, "lng": 144.9790327, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Punters Club</div><div class=\"popup-gig\"><div class=\"popup-title\">SWEETIE &amp; FRIENDS | ROOFTOP VINYL PARTY</div><div class=\"popup-meta\">19:00</div><div class=\"popup-lineup\">Sweetie &amp; Friends</div><div class=\"popup-link\"><a href=\"https://www.facebook.com/events/4445005675740793/\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "Cactus Room Thornbury", "lat": -37.7612582, "lng": 145.0004166, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Cactus Room Thornbury</div><div class=\"popup-gig\"><div class=\"popup-title\">Mirror Clippers</div><div class=\"popup-meta\">20:00 &middot; $15.00</div><div class=\"popup-lineup\">Mirror Clippers | <a href=\"https://open.spotify.com/artist/2RMwEUBsOq8uBPpNev8DdZ\" target=\"_blank\">Dopplerhaus</a> | <a href=\"https://open.spotify.com/artist/5s0u3caXjjbYFc6ZmofeMQ\" target=\"_blank\">Sanszu</a> | Heavy Delay</div><div class=\"popup-link\"><a href=\"https://tickets.oztix.com.au/outlet/event/e66ae764-486f-4efa-87d7-36d26b79729c\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "The Workers Club", "lat": -37.8055776, "lng": 144.9769451, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Workers Club</div><div class=\"popup-gig\"><div class=\"popup-title\">Sleep Box Hotel</div><div class=\"popup-meta\">20:00 &middot; $14.80</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/3UMkoy35Tx5iv1VVgFny8Y\" target=\"_blank\">Sleep Box Hotel</a> | <a href=\"https://open.spotify.com/artist/73egpdU9HnxSs6GpycKeWU\" target=\"_blank\">Malibu Spacey</a> | Slow Exposure</div><div class=\"popup-link\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/f10dba4c-2ebd-4288-a1e5-4b6d97989ed7?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div><div class=\"popup-gig\"><div class=\"popup-title\">Sleep Box Hotel - &quot;Melanie Lane&quot; Launch</div><div class=\"popup-meta\">20:00 &middot; $14.80</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/3UMkoy35Tx5iv1VVgFny8Y\" target=\"_blank\">Sleep Box Hotel</a> | <a href=\"https://open.spotify.com/artist/73egpdU9HnxSs6GpycKeWU\" target=\"_blank\">Malibu Spacey</a> | Slow Exposure</div><div class=\"popup-link\"><a href=\"https://theworkersclub.oztix.com.au/outlet/event/f10dba4c-2ebd-4288-a1e5-4b6d97989ed7?utm_source=TheWorkersClub&utm_medium=Website\" target=\"_blank\">View event &#8594;</a></div></div></div>"}];
 
   venues.forEach(v => {
-    const marker = L.marker([v.lat, v.lng]).addTo(map);
-    marker.bindPopup(v.popupHtml);
+    L.marker([v.lat, v.lng], { icon: dnIcon }).addTo(map).bindPopup(v.popupHtml);
   });
 
   
   const playlistLink = document.createElement('a');
   playlistLink.href = 'https://open.spotify.com/playlist/4Sn0VHKjlZ5wO9kw1cS7x4';
   playlistLink.target = '_blank';
-  playlistLink.textContent = 'Open Spotify Playlist';
-  playlistLink.style.cssText = 'position:absolute;top:10px;right:10px;background:rgba(30,215,96,0.95);color:#000;padding:8px 14px;border-radius:20px;font-weight:600;font-size:13px;text-decoration:none;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,0.15);';
+  playlistLink.textContent = 'Open Playlist ↗';
+  playlistLink.className = 'playlist-btn';
   document.body.appendChild(playlistLink);
 
 </script>
