@@ -83,13 +83,20 @@
     popupAnchor: [0, -10]
   });
 
-  const venues = [{"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Retreat Hotel</div><div class=\"popup-gig\"><div class=\"popup-title\">Jazz School &quot;Kiss it Better Jam&quot;</div><div class=\"popup-meta\">19:00 &middot; Free</div><div class=\"popup-lineup\">Jazz School</div><div class=\"popup-link\"><a href=\"https://retreathotelbrunswick.com.au/gigs/jazz-school-kiss-it-better-jam-retreat-hotel\" target=\"_blank\">View event &#8594;</a></div></div></div>"}];
+  const venues = [{"name": "The Retreat Hotel", "lat": -37.773, "lng": 144.961, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">The Retreat Hotel</div><div class=\"popup-gig\"><div class=\"popup-title\">Jazz School &quot;Kiss it Better Jam&quot;</div><div class=\"popup-meta\">19:00 &middot; Free</div><div class=\"popup-lineup\">Jazz School</div><div class=\"popup-link\"><a href=\"https://retreathotelbrunswick.com.au/gigs/jazz-school-kiss-it-better-jam-retreat-hotel\" target=\"_blank\">View event &#8594;</a></div></div></div>"}, {"name": "Punters Club", "lat": -37.7960561, "lng": 144.9790327, "popupHtml": "<div class=\"popup-inner\"><div class=\"popup-venue\">Punters Club</div><div class=\"popup-gig\"><div class=\"popup-title\">\u2663\ufe0e OUR WEEKENDS END ON MONDAYS! \u2663\ufe0e Mia Marcelle</div><div class=\"popup-meta\">20:00 &middot; Free</div><div class=\"popup-lineup\"><a href=\"https://open.spotify.com/artist/2q992OLEQfLbDdJvW7nWbO\" target=\"_blank\">Mia Marcelle</a></div><div class=\"popup-link\"><a href=\"https://www.facebook.com/events/2043431009544532/\" target=\"_blank\">View event &#8594;</a></div></div></div>"}];
 
   venues.forEach(v => {
     L.marker([v.lat, v.lng], { icon: dnIcon }).addTo(map).bindPopup(v.popupHtml);
   });
 
   
+  const playlistLink = document.createElement('a');
+  playlistLink.href = 'https://open.spotify.com/playlist/6u9uUymWeVkuTyQ1uuTvUx';
+  playlistLink.target = '_blank';
+  playlistLink.textContent = 'Open Playlist ↗';
+  playlistLink.className = 'playlist-btn';
+  document.body.appendChild(playlistLink);
+
 </script>
 </body>
 </html>
